@@ -1,0 +1,14 @@
+service:
+  host: 0.0.0.0
+  port: 9091
+  name: "template-service"
+
+db:
+  host: localhost
+  port: 5432
+  name: template
+  user: 
+  password:
+
+migrations:
+  dir: files/migrations

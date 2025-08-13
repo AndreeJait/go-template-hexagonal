@@ -1,0 +1,66 @@
+# =================================
+# Go
+# =================================
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Output of the go coverage tool
+*.cover
+*.coverprofile
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories (remove if you want to vendor)
+vendor/
+
+# =================================
+# IDE / Editor
+# =================================
+# IntelliJ / GoLand
+.idea/
+
+# VS Code
+.vscode/
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# MacOS
+.DS_Store
+
+# =================================
+# Project-specific
+# =================================
+# Compiled binaries
+/bin/
+build/
+
+# Logs
+*.log
+logs/
+
+# Env & config (local only)
+.env
+.env.*
+!env.example
+
+# Cache
+*.cache
+.cache/
+tmp/
+temp/
+
+# =================================
+# Migration tools / sqlc
+# =================================
+# sqlc gen output (jika mau di-ignore, tapi biasanya tetap di-commit)
+# internal/adapters/outbound/postgres/sqlc/
