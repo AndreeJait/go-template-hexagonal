@@ -161,6 +161,22 @@ func main() {
 		}
 		log.Printf("Created %s\n", upPath)
 		log.Printf("Created %s\n", downPath)
+	case "fresh":
+		log.Println("Dropping all tables...")
+
+		// 1. Drop schema (Postgres-specific)
+		_, err := db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
+		if err != nil {
+			log.Fatalf("failed to reset schema: %v", err)
+		}
+		log.Println("Schema dropped and recreated.")
+
+		// 2. Re-run all migrations up
+		n, err := migrate.Exec(db, "postgres", src, migrate.Up)
+		if err != nil {
+			log.Fatalf("failed to re-apply migrations: %v", err)
+		}
+		log.Printf("Applied %d fresh migrations\n", n)
 
 	default:
 		log.Fatalf("unknown cmd: %s (use up|down|redo|status|new)", *cmd)

@@ -11,6 +11,23 @@ import (
 	"time"
 )
 
+// Package main
+//
+//	@title           Hexagonal Template API
+//	@version         1.0
+//	@description     Hexagonal template service (Hexagonal, Echo v4, Postgres).
+//
+//	@contact.name    Dev Team
+//	@contact.email   dev@example.com
+//
+//	@BasePath        /api/v1
+//
+//	@securityDefinitions.apikey BearerAuth
+//	@in header
+//	@name Authorization
+//	@description  Add prefix: "Bearer <token>"
+//
+//	@securityDefinitions.basic BasicAuth
 func main() {
 	if os.Getenv("APP_ENV") == "" {
 		_ = os.Setenv("APP_ENV", "development")
