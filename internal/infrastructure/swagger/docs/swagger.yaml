@@ -1,0 +1,313 @@
+basePath: /api/v1
+definitions:
+  auth.CreateUserPasswordRequest:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      token:
+        type: string
+    type: object
+  auth.CreateUserPasswordResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  auth.CreateUserPinRequest:
+    properties:
+      confirm_pin:
+        type: string
+      email:
+        type: string
+      pin:
+        type: string
+      token:
+        type: string
+    type: object
+  auth.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      role_id:
+        type: integer
+    type: object
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  auth.LoginResponse:
+    properties:
+      expired_at:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/domain.UserSimplified'
+    type: object
+  domain.UserSimplified:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: integer
+      role_id:
+        type: integer
+      status:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  response.ErrorResponse:
+    properties:
+      error_code:
+        type: integer
+      message:
+        type: string
+      request_id:
+        type: string
+      success:
+        example: false
+        type: boolean
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      message:
+        example: success
+        type: string
+      request_id:
+        example: request_id
+        type: string
+      response_time:
+        example: 100000
+        type: integer
+      success:
+        example: true
+        type: boolean
+    type: object
+info:
+  contact:
+    email: dev@example.com
+    name: Dev Team
+  description: Hexagonal template service (Hexagonal, Echo v4, Postgres).
+  title: Hexagonal Template API
+  version: "1.0"
+paths:
+  /auth/create-password:
+    post:
+      consumes:
+      - application/json
+      description: create user password
+      parameters:
+      - description: CreateUserPasswordRequest
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.CreateUserPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success create user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.CreateUserPasswordResponse'
+              type: object
+        "400":
+          description: validation/bind error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: email already exists
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: create user password
+      tags:
+      - Auth
+  /auth/create-pin:
+    post:
+      consumes:
+      - application/json
+      description: create user pin
+      parameters:
+      - description: CreateUserPinRequest
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.CreateUserPinRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success create user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "400":
+          description: validation/bind error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: email already exists
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      summary: create user pin
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login to app
+      parameters:
+      - description: LoginRequest
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success login user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.LoginResponse'
+              type: object
+        "400":
+          description: validation/bind error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: email already exists
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Login
+      tags:
+      - Auth
+  /healthz:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Health Check
+      tags:
+      - Health
+  /internal/auth/account:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account from internal
+      parameters:
+      - description: CreateUserRequest
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/auth.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success create user
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: validation/bind error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "409":
+          description: email already exists
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Create new user from internal
+      tags:
+      - Auth
+  /user/me:
+    get:
+      consumes:
+      - application/json
+      description: get user info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success create user
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/domain.UserSimplified'
+              type: object
+        "401":
+          description: forbidden
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/response.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: get user info
+      tags:
+      - User
+securityDefinitions:
+  BasicAuth:
+    type: basic
+  BearerAuth:
+    description: 'Add prefix: "Bearer <token>"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

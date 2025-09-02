@@ -7,24 +7,146 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password, created_at, updated_at
+SELECT
+    id, email, full_name, status, password, pin, role_id, created_at, updated_at,
+    token_activation, token_activation_expired_at
 FROM users
 WHERE email = $1
-    LIMIT 1
 `
 
-func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
+type GetUserByEmailRow struct {
+	ID                       int64              `json:"id"`
+	Email                    string             `json:"email"`
+	FullName                 pgtype.Text        `json:"full_name"`
+	Status                   int16              `json:"status"`
+	Password                 pgtype.Text        `json:"password"`
+	Pin                      pgtype.Text        `json:"pin"`
+	RoleID                   int64              `json:"role_id"`
+	CreatedAt                pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt                pgtype.Timestamptz `json:"updated_at"`
+	TokenActivation          pgtype.Text        `json:"token_activation"`
+	TokenActivationExpiredAt pgtype.Timestamp   `json:"token_activation_expired_at"`
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
 	row := q.db.QueryRow(ctx, getUserByEmail, email)
-	var i User
+	var i GetUserByEmailRow
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
+		&i.FullName,
+		&i.Status,
 		&i.Password,
+		&i.Pin,
+		&i.RoleID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.TokenActivation,
+		&i.TokenActivationExpiredAt,
 	)
 	return i, err
+}
+
+const getUserById = `-- name: GetUserById :one
+SELECT
+    id, email, full_name, status, password, pin, role_id, created_at
+FROM users
+WHERE id = $1
+`
+
+type GetUserByIdRow struct {
+	ID        int64              `json:"id"`
+	Email     string             `json:"email"`
+	FullName  pgtype.Text        `json:"full_name"`
+	Status    int16              `json:"status"`
+	Password  pgtype.Text        `json:"password"`
+	Pin       pgtype.Text        `json:"pin"`
+	RoleID    int64              `json:"role_id"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+func (q *Queries) GetUserById(ctx context.Context, id int64) (GetUserByIdRow, error) {
+	row := q.db.QueryRow(ctx, getUserById, id)
+	var i GetUserByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.Status,
+		&i.Password,
+		&i.Pin,
+		&i.RoleID,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const insertWithoutPassword = `-- name: InsertWithoutPassword :execrows
+INSERT INTO users (email, full_name, status, role_id, token_activation,token_activation_expired_at)
+VALUES ($1, $2, $3, $4, $5, $6)
+`
+
+type InsertWithoutPasswordParams struct {
+	Email                    string           `json:"email"`
+	FullName                 pgtype.Text      `json:"full_name"`
+	Status                   int16            `json:"status"`
+	RoleID                   int64            `json:"role_id"`
+	TokenActivation          pgtype.Text      `json:"token_activation"`
+	TokenActivationExpiredAt pgtype.Timestamp `json:"token_activation_expired_at"`
+}
+
+func (q *Queries) InsertWithoutPassword(ctx context.Context, arg InsertWithoutPasswordParams) (int64, error) {
+	result, err := q.db.Exec(ctx, insertWithoutPassword,
+		arg.Email,
+		arg.FullName,
+		arg.Status,
+		arg.RoleID,
+		arg.TokenActivation,
+		arg.TokenActivationExpiredAt,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const updateUserPasswordPinTokenActivationStatusByUserID = `-- name: UpdateUserPasswordPinTokenActivationStatusByUserID :execrows
+UPDATE users
+SET
+    password    = COALESCE($1,    password),
+    pin         = COALESCE($2,         pin),
+    token_activation = COALESCE($3, token_activation),
+    token_activation_expired_at = COALESCE($4, token_activation_expired_at),
+    status = COALESCE($5, status),
+    updated_at       = now()
+WHERE id = $6
+`
+
+type UpdateUserPasswordPinTokenActivationStatusByUserIDParams struct {
+	Password                 pgtype.Text      `json:"password"`
+	Pin                      pgtype.Text      `json:"pin"`
+	TokenActivation          pgtype.Text      `json:"token_activation"`
+	TokenActivationExpiredAt pgtype.Timestamp `json:"token_activation_expired_at"`
+	Status                   pgtype.Int2      `json:"status"`
+	UserID                   int64            `json:"user_id"`
+}
+
+func (q *Queries) UpdateUserPasswordPinTokenActivationStatusByUserID(ctx context.Context, arg UpdateUserPasswordPinTokenActivationStatusByUserIDParams) (int64, error) {
+	result, err := q.db.Exec(ctx, updateUserPasswordPinTokenActivationStatusByUserID,
+		arg.Password,
+		arg.Pin,
+		arg.TokenActivation,
+		arg.TokenActivationExpiredAt,
+		arg.Status,
+		arg.UserID,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
 }

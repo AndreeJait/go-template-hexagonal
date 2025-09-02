@@ -8,10 +8,39 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type User struct {
+type Permission struct {
 	ID        int64            `json:"id"`
-	Email     string           `json:"email"`
-	Password  string           `json:"password"`
+	Name      pgtype.Text      `json:"name"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
 	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+}
+
+type Role struct {
+	ID        int64            `json:"id"`
+	Name      string           `json:"name"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+}
+
+type RolePermission struct {
+	RoleID       int64              `json:"role_id"`
+	PermissionID int64              `json:"permission_id"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+}
+
+type User struct {
+	ID                       int64              `json:"id"`
+	FullName                 pgtype.Text        `json:"full_name"`
+	Email                    string             `json:"email"`
+	Password                 pgtype.Text        `json:"password"`
+	Pin                      pgtype.Text        `json:"pin"`
+	TokenActivation          pgtype.Text        `json:"token_activation"`
+	TokenActivationExpiredAt pgtype.Timestamp   `json:"token_activation_expired_at"`
+	TokenForgotPassword      pgtype.Text        `json:"token_forgot_password"`
+	TokenForgotPin           pgtype.Text        `json:"token_forgot_pin"`
+	Status                   int16              `json:"status"`
+	RoleID                   int64              `json:"role_id"`
+	CreatedAt                pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt                pgtype.Timestamptz `json:"updated_at"`
 }

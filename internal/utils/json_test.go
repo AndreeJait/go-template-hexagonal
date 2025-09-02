@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"finansiku-frontoffice-svc/internal/adapters/outbound/db/postgres/sqlc"
-	"finansiku-frontoffice-svc/internal/domain"
 	"fmt"
+	"github.com/AndreeJait/go-template-hexagonal/internal/adapters/outbound/db/postgres/sqlc"
+	"github.com/AndreeJait/go-template-hexagonal/internal/domain"
 	"github.com/jackc/pgx/v5/pgtype"
 	"testing"
 )

@@ -62,7 +62,7 @@ migrate-fresh:
 
 .PHONY: migrate-down
 migrate-down:
-	APP_ENV=$(APP_ENV) go run ./cmd/migration -cmd=down
+	APP_ENV=$(APP_ENV) go run ./cmd/migration -cmd=down -n=2
 
 .PHONY: migrate-redo
 migrate-redo:

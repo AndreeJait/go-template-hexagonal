@@ -1,14 +1,33 @@
 service:
-  host: 0.0.0.0
+  host: localhost
   port: 9091
-  name: "template-service"
+  name: "go-hexagonal-template"
+  email_sender: "panjaitanandree@gmail.com"
+  redirect_frontend: "http:://localhost:9091"
 
 db:
   host: localhost
   port: 5432
-  name: template
+  name: learn
   user: andre
-  password: andre110102
+  password:
+
+jwt:
+  secret: ""
+
+internal_api:
+  username:
+  password:
+
+email:
+  host:
+  port:
+  user:
+  password:
+  using_t_ls: false
+
+setting:
+  activation_token_in_minute: 180
 
 migrations:
   dir: files/migrations

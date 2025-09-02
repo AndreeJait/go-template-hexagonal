@@ -52,6 +52,12 @@ logs/
 .env
 .env.*
 !env.example
+files/config/development/config.yaml
+files/config/development/config.yml
+files/config/staging/config.yaml
+files/config/staging/config.yml
+files/config/production/config.yaml
+files/config/production/config.yml
 
 # Cache
 *.cache

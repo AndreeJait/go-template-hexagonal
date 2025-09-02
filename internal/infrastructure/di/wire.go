@@ -2,14 +2,17 @@ package di
 
 import (
 	"context"
+	"github.com/AndreeJait/go-template-hexagonal/internal/adapters/outbound/email"
 	"github.com/AndreeJait/go-template-hexagonal/internal/constant"
 	"github.com/AndreeJait/go-template-hexagonal/internal/infrastructure/config"
 	"github.com/AndreeJait/go-template-hexagonal/internal/infrastructure/db"
 	"github.com/AndreeJait/go-utility/configw"
+	"github.com/AndreeJait/go-utility/emailw"
 	"github.com/AndreeJait/go-utility/gracefull"
 	"github.com/AndreeJait/go-utility/loggerw"
 	"github.com/labstack/echo/v4"
 	"os"
+	"time"
 )
 
 func Wire(ctx context.Context) (*echo.Echo, *gracefull.GracefulShutDown, loggerw.Logger, error) {
@@ -22,7 +25,18 @@ func Wire(ctx context.Context) (*echo.Echo, *gracefull.GracefulShutDown, loggerw
 	}
 
 	l, err := loggerw.New(&loggerw.Option{
-		Formatter: logFormat,
+		Formatter:       logFormat,
+		TimestampFormat: time.RFC3339Nano,
+		SaveToFile:      true,         // ✅ new flag
+		FilePath:        "logger.log", // ✅ new path
+		MaxSize:         100,
+		MaxBackups:      14,
+		MaxAge:          14,
+		Compress:        true,
+		ReportCaller:    true,
+		ConsoleAlso:     true, // keep console too
+		IncludeStack:    false,
+		StackMaxDepth:   6,
 	})
 	if err != nil {
 		panic(err)
@@ -50,7 +64,9 @@ func Wire(ctx context.Context) (*echo.Echo, *gracefull.GracefulShutDown, loggerw
 		return nil
 	})
 
-	srv := NewWire(cfg, pg, l)
+	em := email.NewEmailW(emailw.New(cfg.Email), l, cfg)
+
+	srv := NewWire(cfg, pg, l, em)
 	e := srv.initHandler()
 	g.AddFunc("http", func() error {
 		l.Info(ctx, "wire shutting down")

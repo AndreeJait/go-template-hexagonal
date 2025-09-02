@@ -6,6 +6,7 @@ import (
 	"github.com/AndreeJait/go-template-hexagonal/internal/infrastructure/config"
 	"github.com/AndreeJait/go-utility/loggerw"
 	"github.com/AndreeJait/go-utility/response"
+	"github.com/AndreeJait/go-utility/tracer"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
@@ -19,7 +20,7 @@ func NewEcho(cfg *config.Config, log loggerw.Logger) *echo.Echo {
 	e.Server.Addr = fmt.Sprintf("%s:%s", cfg.Service.Host, cfg.Service.Port)
 
 	isDevelopment := config.IsDevelopment()
-	e.HTTPErrorHandler = response.CustomHttpErrorHandler(log, constant.ErrorMap, isDevelopment)
+	e.HTTPErrorHandler = response.CustomHttpErrorHandler(log, constant.ErrorMap, false, false)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -30,12 +31,22 @@ func NewEcho(cfg *config.Config, log loggerw.Logger) *echo.Echo {
 	//e.Use(middleware.Recover())
 	e.Use(loggerw.LoggerWithRequestID(log, isDevelopment))
 
+	tracer.WireLogger(log)
+	e.Use(tracer.Middleware())
+
 	// health
-	e.GET("/healthz", healthz)
+	e.GET("/api/:version/healthz", healthz)
 
 	return e
 }
 
+// Health
+// @Summary  Health Check
+// @Tags     Health
+// @Produce  json
+// @Success  200  {object} response.Response
+// @Router   /healthz [get]
 func healthz(c echo.Context) error {
-	return response.SuccessOK(c, echo.Map{"status": "ok"})
+
+	return response.SuccessOK(c, echo.Map{"status": "ok", "version": c.Param("version")})
 }
