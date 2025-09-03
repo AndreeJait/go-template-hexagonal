@@ -27,8 +27,8 @@ func Wire(ctx context.Context) (*echo.Echo, *gracefull.GracefulShutDown, loggerw
 	l, err := loggerw.New(&loggerw.Option{
 		Formatter:       logFormat,
 		TimestampFormat: time.RFC3339Nano,
-		SaveToFile:      true,         // ✅ new flag
-		FilePath:        "logger.log", // ✅ new path
+		SaveToFile:      true,                // ✅ new flag
+		FilePath:        "./logs/logger.log", // ✅ new path
 		MaxSize:         100,
 		MaxBackups:      14,
 		MaxAge:          14,

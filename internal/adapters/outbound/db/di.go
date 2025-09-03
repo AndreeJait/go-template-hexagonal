@@ -8,8 +8,12 @@ import (
 )
 
 type Repository struct {
-	UserRepo       *user.Repository
-	RoleRepo       *role.Repository
+	// UserRepo
+	UserRepo *user.Repository
+	// TxManager
+	TxManager *db.TxManager
+	// RoleRepo
+	RoleRepo *role.Repository
+	// PermissionRepo
 	PermissionRepo *permission.Repository
-	TxManager      *db.TxManager
 }
